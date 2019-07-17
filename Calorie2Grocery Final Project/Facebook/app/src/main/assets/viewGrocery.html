@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Title of the document</title>
+<script src="https://code.jquery.com/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/start/jquery-ui.css" rel="stylesheet">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+$(function () {
+    var upd_msg;
+
+    /*$("#dialog-modal").dialog({
+				autoOpen: false
+			}); */
+
+    $("#view-btn").click(function () {
+        $.ajax({
+            url: 'http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Sravani/viewGrocery/Service1.svc/JsonGrocery/Sravani',
+            data: 'url',
+            success: function (data) {
+                r = $.parseJSON(data);
+                htmlInsert = '';
+                $.each(r, function (index, item) {
+                    htmlInsert += '<tr class ="rows" id="'+item.g_name+'-row"> <td class="del"><img class="del-icon" src="http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Sravani/AddGrocery/images/deletebtn.jpg" id="image"/></td><td id="item">' + item.g_name + '</td><td  class="editable" id="quan">' + item.g_quantity + '</td><td class="editable" id="meas">' + item.g_measure + '</td></tr>';
+                });
+                $("#gbody").html( htmlInsert );
+                $("#glist").show();
+                $(".del").hide();
+
+                $(".del-icon").click(function () {
+                   
+                   
+                    var img_id = $(this).parent().attr("id");
+                    //console.log(img_id);
+                    var delElement = $(this).parent();
+                    var trElement = delElement.parent();
+                    ingredientId = trElement.children("td#item").html();
+                    console.log(ingredientId);
+                    delAlert(ingredientId);
+                    // $(this).parent().parent().remove();
+                    
+                   
+                });
+
+                $(".editable").click(function () {
+                    var OriginalContent = $(this).text();
+                    $(this).addClass("cellEditing");
+                    $(this).html("<input type='text' value='" + OriginalContent + "' />");
+                    $(this).children().first().focus();
+                    $(this).children().first().keypress(function (e) {
+                        if (e.which == 13) {
+                            var newContent = $(this).val();
+                            var dimensionElement = $(this).parent();
+                            var ingredientElement = dimensionElement.parent();
+                            $(this).parent().text(newContent);
+
+                            dimension = dimensionElement.attr("id");
+                            ingredient = ingredientElement.children("td#item").html();
+
+
+                            ingredientQuantity = ingredientElement.children("td#quan").html();
+                            ingredientMeasure = ingredientElement.children('td#meas').html();
+
+                            console.log('Updating the quantity of ' + ingredient + ' to ' + ingredientQuantity + ' ' + ingredientMeasure);
+
+
+                            $.ajax({
+                                url: 'http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Sravani/viewGrocery/Service1.svc/updateGrocery/Sravani/' + ingredient + '/' + ingredientQuantity + '/' + ingredientMeasure,
+                                data: 'url',
+                                success: function (u) {
+                                    upd_msg = u.name + " " + u.opt_msg;
+                                    console.log(upd_msg);
+                                }
+                            });
+                            $(this).parent().removeClass("cellEditing");
+                        }
+                    });
+                    $(this).children().first().blur(function () {
+                        $(this).parent().text(OriginalContent);
+                        $(this).parent().removeClass("cellEditing");
+                    });
+                });
+            }
+        });
+    });
+    $("#btnedit").click(function () {
+        $(".del").show();
+    });
+});
+
+function deleteIngredient(ingredientId) {
+    console.log("inside deleteIngredient function");
+    console.log("ingredient name " + ingredientId);
+    $.ajax({
+        url: 'http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Sravani/viewGrocery/Service1.svc/deleteGrocery/Sravani/' + ingredientId,
+        data: 'url',
+        success: function (d) {
+            del_msg = d.name + " " + d.opt_msg;
+            console.log(del_msg);
+        }
+    });
+}
+
+
+
+function delAlert(ingredientId) {
+
+    var titleMsg = 'Alert';
+    //console.log("ingredient is " + ingredientId);
+    var outputMsg = 'Are you sure you want to delete ' + ingredientId + '?';
+    //console.log(outputMsg);
+
+    $("#dialog").html(outputMsg).dialog({
+        title: titleMsg,
+        resizable: false,
+        modal: true,
+        buttons: {
+                 "OK": function () {
+                 deleteIngredient(ingredientId);
+                 $("#"+ingredientId+"-row").remove();
+                 $(this).dialog("close");
+            },
+                "Cancel": function () {
+                    
+                $(this).dialog("close");
+            }
+        }
+        //close: onCloseCallback
+    });
+}
+</script>
+
+<style>
+  #glist{display:none;}
+  .groceries {
+    margin-top:20px;
+}
+.table table-striped table-bordered .cellEditing {
+    padding: 0;
+}
+.table table-striped table-bordered .cellEditing input[type=text] {
+    width:100%;
+    border:0;
+    background-color:rgb(255, 253, 210);
+}
+  .del-icon {
+    background-color: transparent;
+    /* make the button transparent */
+    background-repeat: no-repeat;
+    /* make the background image appear only once */
+    background-position: 0px 0px;
+    /* equivalent to 'top left' */
+    border: none;
+    /* assuming we don't want any borders */
+    cursor: pointer;
+    /* make the cursor like hovering over an <a> element */
+    height: 16px;
+    /* make this the size of your image */
+    padding-left: 16px;
+    /* make text start to the right of the image */
+    vertical-align: middle;
+    /* align the text vertically centered */
+}
+</style>
+
+
+</head>
+
+<body>
+<br/>
+<div class="row">
+    <div class="col-md-3">
+        <div class="col-xs-6">
+            <button id="view-btn" class="btn btn-primary">View Grocery List</button>
+        </div>
+        <div class="col-xs-6">
+            <button id="btnedit" class="btn btn-primary pull-right">Edit</button>
+        </div>
+        <br>
+        <div class="groceries col-md-12" id="g1">
+            <table id="glist" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="del"></th>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Units</th>
+                    </tr>
+                </thead>
+                <tbody id="gbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="dialog" style="display: none;"></div>
+</div>
+     
+</body>
+
+</html>

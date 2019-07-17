@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
+  
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/start/jquery-ui.css" rel="stylesheet">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<script>
+
+$(function(){
+	$("#go").click(function(e){getRecipes($("#searchKey").val());});
+		
+});
+
+function getRecipes(keyword){
+    $.ajax({
+    type:"GET",	
+    url: 'https://api.edamam.com/search',
+    data:{q:keyword,app_id:'51aba909',app_key:'9fcd3aa5746d2a423a350cee3ea4d57d'},
+    crossDomain:true,	  
+    dataType: 'jsonp',
+    /*jsonpCallback:"testfunction",*/
+    success: function(r){
+    recipeDivs = "";		
+          
+		  $.each(r.hits,function(index,item){
+              
+               lb = item.recipe.label;
+		     recipeObject = $(this)[0].recipe;	
+			 //console.log(recipeObject);
+              recipe_idx = "recipe-" + index;
+			 //prepare ingredients table
+			 ingredientsTable = "<table><thead><tr><th>Ingredient</th><th>Quantity</th><th>Measure</th><th>Calories</th></thead><tbody>";
+			 $.each(recipeObject.ingredients,function(index2,item2){
+                 //console.log(recipeObject.label);
+				 ingredientsTable += "<tr class='"  + recipe_idx + "'><td>"+item2.food.label+"</td><td class='qty'>"+item2.quantity+"</td><td class='measure'>"+item2.measure.label+"</td><td class='ingredient-calories' id='"+item2.exactFood+"'></td></tr>";
+                 
+	 
+			 });
+              
+			 ingredientsTable += "</tbody></table>";	
+              //console.log(ingredientsTable);
+			 recipeDivs += "<div class='recipe-container' id='" + index + "-recipe'> "+
+			                  "<div class='recipe-header'>"+
+			                  "<img class='recipe-image' src='"+recipeObject.image+"'>"+
+							  "<div class='recipe-title'>"+recipeObject.label +"</div>"+
+							  "</div>"+
+			                  "<div class='recipe-detail' id='"+index+"-detail'> "+
+							     "Total Calories: "+recipeObject.calories.toFixed(0)+
+								 ingredientsTable + '<br/>'
+								 +'<button class="importbtn btn btn-sm btn-warning" data-recipe="' + recipe_idx + '">Import Recipe</button>&nbsp;&nbsp;' 
+								 +'<button class="shopbtn btn btn-sm btn-warning">Generate Shopping List</button>'
+								 + '<div class="shop-list" id="shop-list-' + index + '"></div>' + "</div>" + "</div>";
+			 
+		  });
+		  $("#results").html(recipeDivs); 
+		  initializeResults();
+	  }
+	});
+}
+function initializeResults(){
+ $(".recipe-header").click(function(e){
+ $(".recipe-detail").not($(this).children(".recipe-detail")).hide();
+ $(this).parent(".recipe-container").children(".recipe-detail").toggle();
+ });
+
+ $(".recipe-container").click(function(e){
+     
+ 
+       
+  /*Pass calorie td and get calorie information */   
+     ingredients = $(this).find('.ingredient-calories');    
+     $.each(ingredients,function(index,item){
+         getCalorieInformation($(this));
+     });
+     
+      recipe_nm = $(this).find('.recipe-title').html();  
+      //console.log(recipe_nm);
+     
+     $(".importbtn").click(function(){
+           recipe_id= $(this).data("recipe");
+           console.log(recipe_id);
+        
+      $("tr." + recipe_id ).each(function(){
+        console.log("inside each");
+         ingredient_exact = $(this).find('.ingredient-calories').attr('id');
+         in_qty = $(this).find('.qty').html();
+         in_msure = $(this).find('.measure').html();        
+             var opt_msg=  $.get('http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Sravani/viewGrocery/Service1.svc/importRecipe/'+ recipe_nm + '/' + ingredient_exact +'/'+ in_qty+'/'+ in_msure);
+           
+    var outputMsg = "Recipe imported successfully!!!" 
+          
+    $("#dialog").html(outputMsg).dialog({
+        title: "Alert",
+        resizable: false,
+        modal: true,
+        buttons: {
+                 "OK": function () {
+                     $(this).dialog("close");
+                   }
+            }
+    });
+    });
+     });
+     
+     
+      $(".shopbtn").click(function(){
+          //alert("inside shopping list");
+          console.log(recipe_nm);
+		  recipeId = $(this).parent().attr("id").substring(0,1);
+		  
+          
+       $.ajax({
+    //type:"GET",	
+    url: 'http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Sravani/viewGrocery/Service1.svc/shoppingList/' + recipe_nm,
+           data :'url',
+     success: function(data){
+           r = $.parseJSON(data);
+           console.log(r);
+           shopTable = "<table><thead><tr><th>Shopping List</th></thead></tr><tbody>";
+		   $.each(r, function (index5, item5) {
+            shopTable += "<tr><td>"+item5.ingredient+"</td></tr>";
+           });
+           shopTable += "</tbody></table>";
+           console.log(shopTable);
+           $("#shop-list-"+recipeId).html(shopTable);
+     }
+     
+ });
+});
+                          
+});
+}
+
+function getCalorieInformation(ingredient){
+ 
+ //console.log(ingredient);   
+ 
+    $.ajax({ 
+   url:'http://api.nal.usda.gov/usda/ndb/search/?format=json&q=' + ingredient.attr('id') + '&sort=n&max=1&offset=0&api_key=DgxqZYmXG8YsyCIEfFLkJaAklM4ybQtEHORaKedx',
+   data: 'url',
+   crossDomain:true,
+   success: function (u) {                    
+       $.ajax({
+            url:'http://api.nal.usda.gov/usda/ndb/reports/?ndbno='+u.list.item[0].ndbno +'&type=b&format=json&api_key=DgxqZYmXG8YsyCIEfFLkJaAklM4ybQtEHORaKedx' ,
+        data: 'url',
+           success:function(j){
+               ingredient.html(j.report.food.nutrients[1].value + " " + j.report.food.nutrients[1].unit);
+           },
+           error:function(xhr, error){
+             ndb_no = 'NA';
+         ingredient.html(ndb_no);
+           }                  
+       });
+      },
+     error: function(xhr, error){        
+         ndb_no = 'NA';
+         ingredient.html(ndb_no);
+     } 
+  }); 
+  
+} 
+
+</script>
+
+<style>
+body{font-family:Arial, Helvetica, sans-serif;}
+#searchControlContainer{margin-top:15px;}
+#results{margin-top:20px;}
+.lalign{text-align: left;}
+.recipe-container{margin: auto 15px 0px 15px;border: 1px solid #eee;padding: 10px;position:relative;}
+.recipe-title{display:inline-block;position:absolute;top:24px;left:70px;}
+.recipe-image{height:50px;width:50px;border: 1px solid #ccc;border-radius: 25px;}
+.recipe-detail{display:none;margin-top: 10px;font-size: 13px;}
+.recipe-detail table{margin-top:15px;text-transform:capitalize;width:100%;}
+</style>
+</head>
+
+<body>
+<div class="col-md-12" id="searchControlContainer">
+  <div class="input-group">
+    <input type="text" class="form-control" name="searchKey" id="searchKey" placeholder="Search for..." />
+      <span class="input-group-btn">
+        <button class="btn btn-primary" id="go" type="button">Go!</button>
+      </span>
+    </div><!-- /input-group -->
+</div><!-- /.col-lg-6 -->
+
+<div class="col-md-12" id="results"></div>
+ <div id="dialog" style="display: none;"></div>
+ </body>
+ </html>
+
+
+

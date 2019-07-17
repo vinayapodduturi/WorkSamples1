@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Update Recipe</title>
+<script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/start/jquery-ui.css" rel="stylesheet">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<script type ="text/javascript">
+
+var search ="";
+    htmlInsert1="";
+$(function () {
+    var upd_msg;
+    
+    htmlInsert="";
+
+    /*$("#dialog-modal").dialog({
+				autoOpen: false
+			}); */
+
+    $("#view-btn").click(function () {
+	  htmlInsert="";
+   search= $('#s').val();
+        $.ajax({
+            url: 'http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/vinaya2/displayrecipe/Service1.svc/data/'+search,
+            dataType: 'json',
+            data: 'url',
+            success: function (data) {
+                r = $.parseJSON(data);
+           
+                $.each(r, function (index, item) {
+//                    alert("inside");
+                  //  alert(item.ingredient);
+                    htmlInsert += '<tr class ="rows" id="'+item.ingredient+'-row"> <td class="del"><img class="del-icon" src="http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Sravani/AddGrocery/images/deletebtn.jpg" id="image"/></td><td id="item">' + item.ingredient + '</td><td  class="editable" id="quan">' + item.qunatity + '</td><td class="editable" id="meas">' + item.label + '</td></tr>';
+                   // alert(htmlInsert);
+                });
+				//htmlInsert+='</table>';
+             $("#gbody").html( htmlInsert );
+               $("#glist").show();
+               $(".del").hide();
+ // $("#dialog").append(htmlInsert);
+                
+                $(".del-icon").click(function () {
+                   
+                   
+                    var img_id = $(this).parent().attr("id");
+                    //console.log(img_id);
+                    var delElement = $(this).parent();
+                    var trElement = delElement.parent();
+                    ingredientId = trElement.children("td#item").html();
+                    console.log(ingredientId);
+                    delAlert(ingredientId);
+                    // $(this).parent().parent().remove();
+                    
+                   
+                });
+
+                $(".editable").click(function () {
+                    var OriginalContent = $(this).text();
+                    $(this).addClass("cellEditing");
+                    $(this).html("<input type='text' value='" + OriginalContent + "' />");
+                    $(this).children().first().focus();
+                    $(this).children().first().keypress(function (e) {
+                        if (e.which == 13) {
+                            var newContent = $(this).val();
+                            var dimensionElement = $(this).parent();
+                            var ingredientElement = dimensionElement.parent();
+                            $(this).parent().text(newContent);
+
+                            dimension = dimensionElement.attr("id");
+                            ingredient = ingredientElement.children("td#item").html();
+
+
+                            ingredientQuantity = ingredientElement.children("td#quan").html();
+                            ingredientMeasure = ingredientElement.children('td#meas').html();
+
+                            console.log('Updating the quantity of ' + ingredient + ' to ' + ingredientQuantity + ' ' + ingredientMeasure);
+
+
+                            $.ajax({
+                                url: 'http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Leela/UpdateRecipe/Service1.svc/UpdateRecipe/'+search+'/'+ingredient + '/' + ingredientQuantity + '/' + ingredientMeasure,
+                                data: 'url',
+                                success: function (u) {
+                                    upd_msg = u.ingredient + " " + "Sucessfully";
+                                    console.log(upd_msg);
+                                }
+                            });
+                            $(this).parent().removeClass("cellEditing");
+                        }
+                    });
+                    $(this).children().first().blur(function () {
+                        $(this).parent().text(OriginalContent);
+                        $(this).parent().removeClass("cellEditing");
+                    });
+                });
+            }
+        });
+		
+		 $("#btnadd").click(function(){
+htmlInsert1 = '<tr><div class="add1" id="a1"><td><input type= "text" placeholder="ingredient" id="i2"/></td><td><input type= "text" placeholder="quantity" id="q2"/></td><td><input type= "text" placeholder="units" id="u2"/></td></div><tr><tr><td></td><td><button id="update-btn" class="btn btn-primary pull-left">Update</button></td><td></td></tr>';
+
+      $("#gbody").html(htmlInsert + '</br>' + htmlInsert1);
+         $("#glist").show();
+               $(".del").hide();
+        $("#update-btn").click(function(){
+         $.ajax({
+       url: 'http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Leela/RecipeIngredient/Service1.svc/data/'+ search + '/'+$("#i2").val()+"$" +'/' +$("#q2").val()+"$"+ '/' + $("#u2").val()+"$",
+        data: 'url',
+        success: function (d) {
+            console.log("updation");
+            console.log($("#i2").val());
+            console.log($("#i2").val());
+  
+        }
+    });
+            var outputMsg = "Recipe updated successfully!!!" ;
+          
+    $("#dialog").html(outputMsg).dialog({
+        title: "Alert",
+        resizable: false,
+        modal: true,
+        buttons: {
+                 "OK": function () {
+                     $(this).dialog("close");
+                   }
+            }
+    });
+          
+    });
+});
+    });
+    $("#btnedit").click(function () {
+        $(".del").show();
+    });
+	
+	/*  $("#btnadd").click(function(){
+htmlInsert1 = '<tr><div class="add1" id="a1"><td><input type= "text" placeholder="ingredient" id="i2"/></td><td><input type= "text" placeholder="quantity" id="q2"/></td><td><input type= "text" placeholder="units" id="u2"/></td></div><tr><tr><td></td><td><button id="update-btn" class="btn btn-primary pull-left">Update</button></td><td></td></tr>';
+
+      $("#gbody").html(htmlInsert1);
+         $("#glist").show();
+               $(".del").hide();
+        $("#update-btn").click(function(){
+         $.ajax({
+       url: 'http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Leela/RecipeIngredient/Service1.svc/data/'+ search + '/'+$("#i2").val()+"$" +'/' +$("#q2").val()+"$"+ '/' + $("#u2").val()+"$",
+        data: 'url',
+        success: function (d) {
+            console.log("updation");
+            console.log($("#i2").val());
+            console.log($("#i2").val());
+  
+        }
+    });
+            var outputMsg = "Recipe updated successfully!!!" ;
+          
+    $("#dialog").html(outputMsg).dialog({
+        title: "Alert",
+        resizable: false,
+        modal: true,
+        buttons: {
+                 "OK": function () {
+                     $(this).dialog("close");
+                   }
+            }
+    });
+          
+    });
+}); */
+});
+
+function deleteIngredient(ingredientId) {
+    console.log("inside deleteIngredient function");
+    console.log("ingredient name " + ingredientId);
+    $.ajax({
+       
+        url: 'http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Leela/UpdateRecipe/Service1.svc/deleteRecipe/'+search+'/'+ ingredientId,
+        data: 'url',
+        success: function (d) {
+            del_msg = d.name + " " + d.opt_msg;
+            console.log(del_msg);
+        }
+    });
+}
+
+
+
+function delAlert(ingredientId) {
+
+    var titleMsg = 'Alert';
+    //console.log("ingredient is " + ingredientId);
+    var outputMsg = 'Are you sure you want to delete ' + ingredientId + '?';
+    //console.log(outputMsg);
+
+    $("#dialog").html(outputMsg).dialog({
+        title: titleMsg,
+        resizable: false,
+        modal: true,
+        buttons: {
+                 "OK": function () {
+                 deleteIngredient(ingredientId);
+                 $("#"+ingredientId+"-row").remove();
+                 $(this).dialog("close");
+            },
+                "Cancel": function () {
+                    
+                $(this).dialog("close");
+            }
+        }
+        //close: onCloseCallback
+    });
+}
+   // alert("before"); 
+    
+  
+
+
+
+
+</script>
+
+<style>
+    #glist {
+    display:none;
+    margin-top:20px;
+    }
+    .groceries {
+    margin-top:20px;
+    }
+    .table table-striped table-bordered .cellEditing {
+    padding: 0;
+    }
+    .table table-striped table-bordered .cellEditing input[type=text] {
+    width:100%;
+    border:0;
+    background-color:rgb(255, 253, 210);
+    }
+    .del-icon {
+    background-color: transparent;
+    /* make the button transparent */
+    background-repeat: no-repeat;
+    /* make the background image appear only once */
+    background-position: 0px 0px;
+    /* equivalent to 'top left' */
+    border: none;
+    /* assuming we don't want any borders */
+    cursor: pointer;
+    /* make the cursor like hovering over an <a> element */
+    height: 16px;
+    /* make this the size of your image */
+    padding-left: 16px;
+    /* make text start to the right of the image */
+    vertical-align: middle;
+    /* align the text vertically centered */
+    }
+</style>
+</head>
+
+<body>
+<div class="form-group">
+
+    <input type="text" class="form-control" id="s" placeholder="RecipeName">
+</div>
+
+<div class="col-xs-8">
+    <button id="view-btn" class="btn btn-primary pull-left">Get Recipe</button>
+
+
+    <button id="btnadd" class="btn btn-primary pull-center">Add</button>
+    <button id="btnedit" class="btn btn-primary pull-right">Delete</button>
+</div>
+<br>
+<div class="groceries col-md-12" id="g1">
+    <table id="glist" class="table table-striped">
+        <thead>
+        <tr>
+            <th class="del"></th>
+            <th>Ingredient</th>
+            <th>Quantity</th>
+            <th>Units</th>
+        </tr>
+        </thead>
+        <tbody id="gbody">
+        </tbody>
+    </table>
+
+
+    <div id="dialog" style="display: none;"></div>
+</div>
+</body>
+</html>
+
+
+

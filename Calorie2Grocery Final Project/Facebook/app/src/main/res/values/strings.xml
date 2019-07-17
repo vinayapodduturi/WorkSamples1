@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Facebook</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="app_id">777753365641977</string>
+    <string name="update_status"></string>
+    <string name="post_image"></string>
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_home">Home</string>
+    <string name="title_activity_success_register">SuccessRegister</string>
+    <string-array name="units_list">
+        <item>gm</item>
+        <item>kg</item>
+        <item>l</item>
+        <item>gal</item>
+        <item>lb</item>
+        <item>Oz</item>
+    </string-array>
+
+</resources>

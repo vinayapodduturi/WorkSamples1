@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/backgrnd">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="My Groceries"
+        android:id="@+id/textView2"
+        android:layout_marginTop="45dp"
+        android:width="200dp"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:textColor="#ff050505"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Grocery"
+        android:id="@+id/btnaddgrocery"
+        android:layout_marginTop="79dp"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:background="#585858"
+        android:width="320dp"
+        android:textColor="#fff7f7ce"
+        android:textSize="25dp"
+        android:textStyle="bold|italic" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View/Edit Grocery List"
+        android:id="@+id/btnvwgrcylist"
+        android:width="320dp"
+        android:textStyle="bold|italic"
+        android:textSize="25dp"
+        android:background="#585858"
+        android:textColor="#fff7f7ce"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/btnaddgrocery"
+        android:layout_alignStart="@+id/btnaddgrocery" />
+</RelativeLayout>

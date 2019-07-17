@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Create Recipe</title>
+  
+  <script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
+  
+  
+  
+  
+  <script type="text/javascript" src="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.css">
+  
+  <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+  
+    
+      <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
+
+    <script type='text/javascript'>
+	$(document).ready(function(){
+
+
+$("#button").click(function(){
+
+var recipename =  $("#s").val();
+var foodname =  $("#i").val()+"$"+$("#i2").val()+"$"+$("#i3").val()+"$"+$("#i4").val()+"$";
+var quantity = $("#q").val()+"$"+$("#q2").val()+"$"+$("#q3").val()+"$"+$("#q4").val()+"$";
+var quantityparam = $("#u").val()+"$"+$("#u2").val()+"$"+$("#u3").val()+"$"+$("#u4").val()+"$";
+    
+
+$.ajax({
+    type: 'GET',
+    url: 'http://kc-sce-cs551-2.kc.umkc.edu/aspnet_client/MPG12/Leela/RecipeIngredient/Service1.svc/data/'+recipename+'/'+foodname+'/'+quantity+'/'+quantityparam,
+    contentType: 'text/html',
+    dataType: 'jsonp'
+
+    });
+});
+
+
+     
+    $("#button1").click(function()  {
+   htmlInsert = '<div class="add1" id="a1"><input type= "text" placeholder="ingredient" id="i2"/><input type= "text" placeholder="quantity" id="q2"/><input type= "text" placeholder="units" id="u2"/><br><input type= "text" placeholder="ingredient" id="i3"/><input type= "text" placeholder="quantity" id="q3"/><input type= "text" placeholder="units" id="u3"/><br><input type= "text" placeholder="ingredient" id="i4"/><input type= "text" placeholder="quantity" id="q4"/><input type= "text" placeholder="units" id="u4"/>';
+    $('#a').html(htmlInsert);
+    });
+});
+</script>
+<body><p><b>Create New Recipe</b></p>
+<input data-bind='value: recipename' placeholder='Recipe Name'id='s' />
+                 <input data-bind='value: ingredient' placeholder='ingredient'id='i'/>
+         <input data-bind='value: quantity' placeholder='quantity'id='q'/>
+         <input data-bind='value: units' placeholder='units'id='u'/>
+        
+         <button id="button1" type = 'button'>Add More</button>
+<div class='add' id='a'></div>
+<button id="button" type = 'submit'>Save</button>
+</body>
+</head>
+</html>

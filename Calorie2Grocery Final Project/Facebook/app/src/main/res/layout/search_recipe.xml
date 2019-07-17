@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/backgrnd">
+
+    <WebView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/webView_srch"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/btnSearch" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search Recipe"
+        android:id="@+id/btnSearch"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:width="400dp"
+        android:textStyle="bold"
+        android:textSize="25dp"
+        android:textColor="#fffaffd8"
+        android:background="#585858"
+        android:layout_toLeftOf="@+id/btnhome3"
+        android:layout_toStartOf="@+id/btnhome3"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Home"
+        android:id="@+id/btnhome3"
+        android:background="#585858"
+        android:width="150dp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:textSize="25dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/webView_srch" />
+</RelativeLayout>
